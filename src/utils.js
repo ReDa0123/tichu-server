@@ -29,6 +29,7 @@ export const alwaysNull = always(null);
 export const isNilOrEmpty = anyPass([isNil, isEmpty]);
 export const notEqual = complement(equals);
 export const propNotEq = complement(propEq);
+export const equalsToOne = equals(1);
 
 export const randomizeDeck = () => {
   const shuffledDeck = [...DECK];

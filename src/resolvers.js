@@ -203,10 +203,7 @@ export const resolveTeamEnd = (
 
 export const resolveTichuPartEnd = (
   io,
-  sentTichus,
-  roomId,
-  gameState,
-  isBigTichuPart
+  { sentTichus, roomId, gameState, isBigTichuPart }
 ) => {
   if (values(sentTichus).length === MAX_PLAYERS) {
     const newGameState = {
