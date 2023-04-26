@@ -15,6 +15,10 @@ import {
   resolveTurnEnd,
 } from "../resolvers.js";
 import { emitMessage, emitStateChanged } from "../emiters.js";
+import {
+  getCombinationType,
+  isValidCombination,
+} from "../combinationResolver/combinationResolver.js";
 
 export const dogListener = (io, socket) => () => {
   const socketId = socket.id;
@@ -115,6 +119,18 @@ export const playCardsListener =
     const socketId = socket.id;
     const roomId = socket.room;
     const gameState = getGameState(roomId);
+    const playedCombinationType = getCombinationType(cards);
+    if (
+      combinationType !== playedCombinationType ||
+      !isValidCombination(
+        cards,
+        playedCombinationType,
+        gameState.currentCombination
+      )
+    ) {
+      socket.emit("message", "Invalid combination");
+      socket.emit("stateChanged", gameState);
+    }
     const {
       turnOrder,
       finished,

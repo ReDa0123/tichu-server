@@ -26,7 +26,7 @@ import {
   values as rValues,
 } from "ramda";
 import { isCardInArray, equalsToOne, isNilOrEmpty } from "../utils.js";
-import { BOMBS, COMBINATIONS, PHOENIX_NAME, VALUES } from "../constants";
+import { BOMBS, COMBINATIONS, PHOENIX_NAME, VALUES } from "../constants.js";
 
 const getCardValues = o(
   sort(ascend(identity)),

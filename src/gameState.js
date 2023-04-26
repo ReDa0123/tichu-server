@@ -1,6 +1,6 @@
 import { alwaysEmptyArray, chunkDeck, randomizeDeck } from "./utils.js";
 import { DEFAULT_CURRENT_COMBINATION, GAME_PARTS } from "./constants.js";
-import { map } from "ramda";
+import { addIndex, map } from "ramda";
 import { emitMessage, emitStateChanged } from "./emiters.js";
 
 const gameStates = {};
@@ -86,7 +86,10 @@ export const startNewTurn = (io, roomId) => {
   const roomGameState = getGameState(roomId);
   const shuffledDeck = randomizeDeck();
   const chunks = chunkDeck(shuffledDeck);
-  const newCards = roomGameState.cards.map((_, i) => chunks[i]);
+  const newCards = addIndex(map)(
+    (_, index) => chunks[index],
+    roomGameState.cards
+  );
   const newGameState = {
     ...roomGameState,
     collectedCards: map(alwaysEmptyArray, roomGameState.collectedCards),
