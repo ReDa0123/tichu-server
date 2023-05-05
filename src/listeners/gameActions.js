@@ -83,7 +83,8 @@ export const dogListener = (io, socket) => () => {
   };
   setGameState(roomId, newGameState);
   emitStateChanged(io, roomId, newGameState);
-  emitMessage(io, roomId, `${socketId} played a dog.`);
+  const username = io.sockets.sockets.get(socketId).username;
+  emitMessage(io, roomId, `${username} played a dog.`);
 };
 
 export const passListener = (io, socket) => () => {
@@ -110,7 +111,8 @@ export const passListener = (io, socket) => () => {
   };
   setGameState(roomId, newGameState);
   emitStateChanged(io, roomId, newGameState);
-  emitMessage(io, roomId, `${socketId} passed.`);
+  const username = io.sockets.sockets.get(socketId).username;
+  emitMessage(io, roomId, `${username} passed.`);
 };
 
 export const playCardsListener =
@@ -180,11 +182,11 @@ export const playCardsListener =
     if (didAnyTeamFinish(newFinished, teams)) {
       return resolveTeamEnd(io, { socketId, teams, roomId, cardsInHand });
     }
-
+    const updatedGameState = getGameState(roomId);
     const newGameState = {
-      ...gameState,
+      ...updatedGameState,
       cards: {
-        ...gameState.cards,
+        ...updatedGameState.cards,
         [socketId]: newPlayersCards,
       },
       currentCombination: {
@@ -201,10 +203,11 @@ export const playCardsListener =
     const cardsMessageArray = cards.map(({ name, color, number }) => {
       return name ? name : `${number}${color}`;
     });
+    const username = io.sockets.sockets.get(socketId).username;
     emitMessage(
       io,
       roomId,
-      `${socketId} played ${cardsMessageArray.join(", ")}.`
+      `${username} played ${cardsMessageArray.join(", ")}.`
     );
     emitStateChanged(io, roomId, newGameState);
   };

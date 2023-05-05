@@ -99,10 +99,12 @@ export const resolveTurnEnd = (io, roomId, sendDeckTo) => {
     sendDeck: false,
   };
   setGameState(roomId, newGameState);
+  const usernameOfReceiver = io.sockets.sockets.get(deckReceiver).username;
+  const usernameOfOnPlay = io.sockets.sockets.get(playerOnPlay).username;
   emitMessage(
     io,
     roomId,
-    `${deckReceiver} has won the deck. ${playerOnPlay} has the initiative.`
+    `${usernameOfReceiver} has won the deck. ${usernameOfOnPlay} has the initiative.`
   );
   emitStateChanged(io, roomId, newGameState);
 };
@@ -218,10 +220,10 @@ export const resolveTichuPartEnd = (
 };
 
 export const resolveFailOtherTichus = (io, roomId) => {
-  const gameState = getGameState(roomId);
-  const filteredTichus = filter(identity, gameState.tichu);
+  const filteredTichus = filter(identity, getGameState(roomId).tichu);
   if (isEmpty(filteredTichus)) return;
   forEachObjIndexed((tichu, socketId) => {
+    const gameState = getGameState(roomId);
     const teamOfSocket = find((team) => includes(socketId, team.players))(
       gameState.teams
     );
@@ -240,10 +242,11 @@ export const resolveFailOtherTichus = (io, roomId) => {
       tichu: map(alwaysNull, gameState.tichu),
     };
     setGameState(roomId, newGameState);
+    const username = io.sockets.sockets.get(socketId).username;
     emitMessage(
       io,
       roomId,
-      `${socketId} has failed to complete a ${
+      `${username} has failed to complete a ${
         tichu === GAME_PARTS.BIG_TICHU ? "Grand Tichu" : "Tichu"
       }.`
     );
@@ -276,10 +279,11 @@ export const resolveTichus = (io, { teams, socketId, roomId, tichus }) => {
       tichu: tichusWithoutSocket,
     };
     setGameState(roomId, newGameState);
+    const username = io.sockets.sockets.get(socketId).username;
     emitMessage(
       io,
       roomId,
-      `${socketId} has successfully completed a ${
+      `${username} has successfully completed a ${
         socketsTichu === GAME_PARTS.BIG_TICHU ? "Grand Tichu" : "Tichu"
       }.`
     );

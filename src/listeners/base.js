@@ -9,24 +9,37 @@ import {
   startNewTurn,
 } from "../gameState.js";
 
-export const joinRoomListener = (io, socket) => (roomId) => {
-  console.log(`${socket.id} is trying to join room ${roomId}`);
-  const joined = io.sockets.adapter.rooms.get(roomId);
-  const numPlayers = joined ? joined.size : 0;
-  if (numPlayers >= MAX_PLAYERS) {
-    socket.emit("roomFull");
-    return;
-  }
+export const joinRoomListener =
+  (io, socket) =>
+  ({ roomId, name }) => {
+    console.log(
+      `${socket.id} is trying to join room ${roomId} with the name ${name}`
+    );
+    const joinedRoom = io.sockets.adapter.rooms.get(roomId);
+    const numPlayers = joinedRoom ? joinedRoom.size : 0;
+    if (numPlayers >= MAX_PLAYERS) {
+      return socket.emit("roomFull");
+    }
 
-  socket.room = roomId;
-  socket.join(roomId);
-  io.to(roomId).emit("newConnection", numPlayers + 1);
+    if (joinedRoom) {
+      for (const clientId of joinedRoom) {
+        const client = io.sockets.sockets.get(clientId);
+        if (client.username && client.username === name) {
+          return socket.emit("sameName");
+        }
+      }
+    }
 
-  if (numPlayers + 1 === MAX_PLAYERS) {
-    initGameState(io, roomId);
-    io.to(roomId).emit("gameReady", getGameState(roomId));
-  }
-};
+    socket.room = roomId;
+    socket.username = name;
+    socket.join(roomId);
+    io.to(roomId).emit("newConnection", numPlayers + 1);
+
+    if (numPlayers + 1 === MAX_PLAYERS) {
+      initGameState(io, roomId);
+      io.to(roomId).emit("gameReady", getGameState(roomId));
+    }
+  };
 
 export const leaveRoomListener = (io, socket) => () => {
   console.log(`${socket.id} is leaving room ${socket.room}`);

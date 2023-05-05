@@ -11,13 +11,14 @@ export const callTichuListener =
     const gameState = getGameState(roomId);
     const gamePart = gameState.gamePart;
     const isBigTichuPart = gamePart === GAME_PARTS.BIG_TICHU;
+    const username = io.sockets.sockets.get(socketId).username;
     if (isBigTichuPart || alreadyPlayedBigTichu) {
       setTichusForPlayer(roomId, socketId, GAME_PARTS.BIG_TICHU);
       !alreadyPlayedBigTichu &&
-        emitMessage(io, roomId, `${socketId} called a grand tichu.`);
+        emitMessage(io, roomId, `${username} called a grand tichu.`);
     } else {
       setTichusForPlayer(roomId, socketId, GAME_PARTS.SMALL_TICHU);
-      emitMessage(io, roomId, `${socketId} called a tichu.`);
+      emitMessage(io, roomId, `${username} called a tichu.`);
     }
 
     resolveTichuPartEnd(io, {

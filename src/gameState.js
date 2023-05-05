@@ -55,7 +55,9 @@ export const initGameState = (io, roomId) => {
   finalState.collectedCards = {};
   finalState.cards = {};
   finalState.tichu = {};
+  finalState.usernames = {};
   clientIds.forEach((clientId) => {
+    finalState.usernames[clientId] = io.sockets.sockets.get(clientId).username;
     sentCards[roomId][clientId] = [];
     finalState.cards[clientId] = chunks[i];
     finalState.collectedCards[clientId] = [];
