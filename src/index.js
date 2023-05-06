@@ -24,27 +24,29 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   console.log(`${socket.id} connected`);
 
-  socket.on("joinRoom", joinRoomListener(io, socket));
+  const withSocketContext = (listener) => listener(io, socket);
 
-  socket.on("leaveRoom", leaveRoomListener(io, socket));
+  socket.on("joinRoom", withSocketContext(joinRoomListener));
 
-  socket.on("callTichu", callTichuListener(io, socket));
+  socket.on("leaveRoom", withSocketContext(leaveRoomListener));
 
-  socket.on("tichuPass", tichuPassListener(io, socket));
+  socket.on("callTichu", withSocketContext(callTichuListener));
 
-  socket.on("sendCards", sendCardsListener(io, socket));
+  socket.on("tichuPass", withSocketContext(tichuPassListener));
 
-  socket.on("dog", dogListener(io, socket));
+  socket.on("sendCards", withSocketContext(sendCardsListener));
 
-  socket.on("pass", passListener(io, socket));
+  socket.on("dog", withSocketContext(dogListener));
 
-  socket.on("sendDeck", sendDeckListener(io, socket));
+  socket.on("pass", withSocketContext(passListener));
 
-  socket.on("playCards", playCardsListener(io, socket));
+  socket.on("sendDeck", withSocketContext(sendDeckListener));
 
-  socket.on("continue", continueListener(io, socket));
+  socket.on("playCards", withSocketContext(playCardsListener));
 
-  socket.on("disconnect", disconnectListener(io, socket));
+  socket.on("continue", withSocketContext(continueListener));
+
+  socket.on("disconnect", withSocketContext(disconnectListener));
 });
 
 httpServer.listen(3005);

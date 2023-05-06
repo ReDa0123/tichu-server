@@ -44,11 +44,9 @@ export const joinRoomListener =
 export const leaveRoomListener = (io, socket) => () => {
   console.log(`${socket.id} is leaving room ${socket.room}`);
   socket.leave(socket.room);
-  if (io.sockets.adapter.rooms.get(socket.room)?.size != null) {
-    io.to(socket.room).emit(
-      "otherDisconnected",
-      io.sockets.adapter.rooms.get(socket.room).size
-    );
+  const roomSize = io.sockets.adapter.rooms.get(socket.room)?.size;
+  if (roomSize != null) {
+    io.to(socket.room).emit("otherDisconnected", roomSize);
   }
   socket.room = undefined;
 };
